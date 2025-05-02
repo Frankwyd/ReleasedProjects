@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+</head>
+<body>
+    <h2>WebSocket Test Client</h2>
+    <div id="messages"></div>
+
+    <script>
+        const client = new StompJs.Client({
+            webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+            debug: function (str) {
+                console.log(str);
+            },
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000
+        });
+
+        client.onConnect = function(frame) {
+            console.log('Connected: ' + frame);
+            
+            // 订阅交易更新
+            client.subscribe('/topic/trades', function(message) {
+                const data = JSON.parse(message.body);
+                document.getElementById('messages').innerHTML += 
+                    `<p>Received: ${JSON.stringify(data, null, 2)}</p>`;
+            });
+        };
+
+        client.onStompError = function (frame) {
+            console.log('Broker reported error: ' + frame.headers['message']);
+            console.log('Additional details: ' + frame.body);
+        };
+
+        client.activate();
+    </script>
+</body>
+</html> 

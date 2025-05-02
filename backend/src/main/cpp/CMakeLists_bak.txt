@@ -1,0 +1,60 @@
+cmake_minimum_required(VERSION 3.10)
+project(QuantLibJNI)
+
+# 设置 C++ 标准
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# 查找 JNI
+find_package(JNI REQUIRED)
+include_directories(${JNI_INCLUDE_DIRS})
+
+# 设置 QuantLib 和 Boost 包含目录
+include_directories(
+    ${QUANTLIB_INCLUDE_DIR}
+    ${Boost_INCLUDE_DIRS}
+)
+
+# 设置输出目录到后端资源目录
+if(WIN32)
+    set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/src/main/resources/lib/win32")
+elseif(APPLE)
+    set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/src/main/resources/lib/darwin")
+else()
+    set(LIBRARY_OUTPUT_PATH "${CMAKE_SOURCE_DIR}/src/main/resources/lib/linux")
+endif()
+
+# 创建共享库
+add_library(QuantLibJNI SHARED
+    FXOptionJNI.cpp
+)
+
+# 链接依赖库
+target_link_libraries(QuantLibJNI
+    PRIVATE
+    ${JNI_LIBRARIES}
+    ${QUANTLIB_LIBRARY}
+)
+
+# 设置输出名称
+if(WIN32)
+    set_target_properties(QuantLibJNI PROPERTIES 
+        OUTPUT_NAME "QuantLibJNI"
+        DEBUG_POSTFIX "d"  # Debug 版本添加 d 后缀
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${LIBRARY_OUTPUT_PATH}/Debug"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${LIBRARY_OUTPUT_PATH}/Release"
+    )
+else()
+    set_target_properties(QuantLibJNI PROPERTIES 
+        OUTPUT_NAME "libQuantLibJNI"
+        DEBUG_POSTFIX "d"  # Debug 版本添加 d 后缀
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${LIBRARY_OUTPUT_PATH}/Debug"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${LIBRARY_OUTPUT_PATH}/Release"
+    )
+endif()
+
+# 安装规则
+install(TARGETS QuantLibJNI
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION lib
+) 

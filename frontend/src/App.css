@@ -1,0 +1,22 @@
+.layout {
+  min-height: 100vh;
+}
+
+.ant-layout-header {
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ant-layout-header h1 {
+  margin: 0;
+  color: #1890ff;
+  line-height: 64px;
+}
+
+.ant-layout-content {
+  margin: 24px;
+  padding: 24px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+} 
